@@ -1,3 +1,9 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI';
+}
+
 canvas {
     border: inset black; 
     border-radius: 15px; 
@@ -6,17 +12,33 @@ canvas {
 .canvas {
     grid-column-start: 2;
     grid-column-end: 6;  
+    grid-row: 1/2;
     width: 100%;
     height: 100%;
+}
+
+.nav {
+    top: 0;
+    width: 100%;
+    background-color: #012456;
+}
+
+.nav-title {
+    margin: 0 0 20px 0;
+    padding: 10px;
+    color: white;
+    font-weight: 100;
+    font-size: 2.5em;
 }
 
 .grid {
     display: grid;
 
-    grid-template-columns: 100px 20% 20% 20% 20% 100px;
-
+    grid-template-columns: 100px 1fr 1fr 1fr 1fr 100px;
+    grid-gap: 20px;
     align-items: center;
     justify-items: center;
+
 } 
 
 
@@ -51,13 +73,6 @@ canvas {
     align-items: center;
 }
 
-button {
-    margin: 10px;
-    background-color: ;
-    border-style: outset;
-
-}
-
 li {
     list-style: none;
 }
@@ -73,13 +88,11 @@ input[type="range"] {
     width: 100%;
 }
 
-.toggle-shape {
-    margin: 10px;
-    background-color:;
-}
+
 
 .icon-invisible {
     display: none;
+    
 }
 
 .icon-fillstroke {
@@ -92,4 +105,31 @@ input[type="range"] {
 
 .sliders {
     max-width: 300px;
+}
+
+#surprise {
+    grid-column-start: 2;
+    grid-column-end: 6;
+    width: 100%;
+    font-size: 2em;
+    padding: 20px;
+}
+
+button {
+    padding: 0;
+    margin: 0;
+    border-radius: 5px;
+}
+
+#strokeWidth {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    background-color: rgba(0, 128, 255, 0.2);
+    font-size: 1.5em;
+    text-align: center
+}
+
+.mirror {
+    transform: scaleX(-1);
 }
