@@ -23,14 +23,20 @@ function redo() {
     }
 }
 
-function renderShape(objshape, x, y, x2, y2, strokeColor, fillColor) {
+function renderShape(objshape, x, y, x2, y2, strokeColor, fillColor, lineWidth, path) {
     ctx.beginPath();
+    ctx.lineWidth = lineWidth ? lineWidth : 1;
     switch (objshape) {
         case "square": ctx.rect(x, y, x2 - x, y2 - y);
         break;
         case "circle": ctx.arc(x, y, getDistance(x2 - x, y2 - y), 0, 2 * Math.PI);
         break;
         case "line": ctx.moveTo(x, y); ctx.lineTo(x2, y2);
+        break;
+        case "path" : ctx.moveTo(path[0].x, path[0].y);
+        for (var i = 1; i < path.length; i++) {
+            ctx.lineTo(path[i].x, path[i].y)
+        }
         break;
     }
     ctx.fillStyle = fillColor ? fillColor : "rgba(0,0,0,0)";
@@ -44,6 +50,10 @@ function renderShape(objshape, x, y, x2, y2, strokeColor, fillColor) {
 function updateMousePos(event) {
     mouse_x = event.offsetX;
     mouse_y = event.offsetY;
+
+    if (mouseIsDown) {
+        path.push({"x" : mouse_x, "y": mouse_y})
+    }
 }
 
 function updateSelectedShape(newShape) {
@@ -76,4 +86,16 @@ function rgba(r, g, b, a){
 
 function rgb(r, g, b) {
     return rgba(r,g,b)
+}
+
+function strokeUp() {
+    if (strokeWidth.value < 12) {
+        strokeWidth.value++
+    }
+}
+
+function strokeDown() {
+    if (strokeWidth.value > 1) {
+        strokeWidth.value--
+    }
 }
