@@ -27,6 +27,8 @@ colorSelector = document.getElementById('colorSelector');
 
 lineWidth = document.getElementById('lineWidth');
 
+var colorPickerRed;
+
 /*
     Document loaded
 */
@@ -101,6 +103,8 @@ window.addEventListener('load', event => {
             canvasObjects.push(undoHistory.pop());
         }
     })
+
+    colorPickerRed = new ColorpickerCanvas(document.getElementById('colorPickerRed'), "red");
 
     // start drawing
     window.requestAnimationFrame(renderObjects);
