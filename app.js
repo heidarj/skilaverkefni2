@@ -1,3 +1,15 @@
+/*
+    Skilaverkefni 2
+    Forritun - HR
+    Heiðar Hólmberg Jónsson
+    Verkefnið er live á  https://heidarj.github.io/skilaverkefni2/
+*/
+
+
+/*
+    Define variables
+*/
+
 var canvas;
 var drawingContext;
 var canvasContainer;
@@ -8,9 +20,7 @@ var initMousePos;
 var mousetravel;
 var canvasObjects = [];
 var undoHistory = [];
-var colorType;
-var strokeColor = "black";
-var fillColor = "transparent";
+
 var lineWidth;
 
 var mouseIsDown = false;
@@ -19,6 +29,24 @@ var shape = 'square';
 
 var currentObject;
 
+
+/*
+    Get the sliders used in stroke and fill color selection
+*/
+var strokeR = document.getElementById("strokeSelectorRed");
+var strokeG = document.getElementById("strokeSelectorGreen");
+var strokeB = document.getElementById("strokeSelectorBlue");
+var strokeA = document.getElementById("strokeSelectorAlpha");
+
+var fillR = document.getElementById("fillSelectorRed");
+var fillG = document.getElementById("fillSelectorGreen");
+var fillB = document.getElementById("fillSelectorBlue");
+var fillA = document.getElementById("fillSelectorAlpha");
+
+
+/*
+    Get other elements used in the app
+*/
 canvasContainer = document.getElementById('canvasContainer');
 canvas = document.getElementById('canvas');
 drawingContext = canvas.getContext('2d');
@@ -27,84 +55,98 @@ colorSelector = document.getElementById('colorSelector');
 
 lineWidth = document.getElementById('lineWidth');
 
+
+/*
+    function which returns a css rgba string
+*/
+function rgba(r, g, b, a){
+    return "rgb("+r+","+g+","+b+","+ ( a != null ? a : 1 ) +")";
+}
+
 /*
     Document loaded
 */
 window.addEventListener('load', event => {
-
     // resize canvas to fit screen
     canvas.width = canvasContainer.clientWidth;
     canvas.height = canvasContainer.clientHeight;
 
-    // add onclick to tool select buttons
-    document.querySelectorAll('.toolSelect').forEach(button => {
-        button.onclick = function () {
-            shape = this.id;
-        }
-    });
-
-    // add onClick to border and fill color select
-    document.querySelectorAll('.colorSelect').forEach(button => {
-        button.onclick = function () {
-            colorSelector.style.display = "inherit"
-            colorType = this.id;
-        }
-    });
-
-    document.querySelectorAll('.color').forEach(color => {
-        color.onclick = function () {
-            switch (colorType) {
-                case 'fill':
-                    fillColor = this.id;
-                    document.documentElement.style.setProperty("--fillColor", this.id);
-                    break;
-                case 'stroke':
-                    strokeColor = this.id;
-                    document.documentElement.style.setProperty("--strokeColor", this.id);
-                    break;
-            }
-            colorSelector.style.display = "none";
-        }
-    });
-
-    document.querySelectorAll('.lineWidthChange').forEach(button => {
-        button.onclick = function () {
-            switch (this.id) {
-                case 'plus':
-                    lineWidth.value++;
-                    break;
-                case 'minus':
-                    lineWidth.value--;
-                    break;
-            }
-        }
-    });
-
-    document.getElementById('clear').addEventListener("click", event => {
-        if (canvasObjects.length > 0) {
-            undoHistory = canvasObjects;
-            canvasObjects = [];
-        }
-    })
-
-    document.getElementById('undo').addEventListener("click", event => {
-        if (canvasObjects.length > 0) {
-            undoHistory.push(canvasObjects.pop());
-        } else if (canvasObjects.length == 0 && undoHistory.length > 0) {
-            canvasObjects = undoHistory;
-            undoHistory = [];
-        }
-    })
-
-    document.getElementById('redo').addEventListener("click", event => {
-        if (undoHistory.length > 0) {
-            canvasObjects.push(undoHistory.pop());
-        }
-    })
-
-    // start drawing
+    // ask the browser to call the renderObjects function when the next frame is ready
     window.requestAnimationFrame(renderObjects);
 });
+
+// add onclick to tool select buttons
+document.querySelectorAll('.toolSelect').forEach(button => {
+    button.onclick = function () {
+        shape = this.id;
+    }
+});
+
+// add onClick to border and fill color select
+document.querySelectorAll('.colorSelect').forEach(button => {
+    button.onclick = function () {
+        colorSelector.style.display = "inherit"
+    }
+});
+
+/*
+    add onClick to done button in the color select tool
+*/
+document.getElementById("colorSelectorDone").addEventListener('click', function(e) {
+    colorSelector.style.display = "none"  
+})
+
+document.getElementById('clear').addEventListener("click", event => {
+    if (canvasObjects.length > 0) {
+        undoHistory = canvasObjects;
+        canvasObjects = [];
+    }
+})
+
+
+/*
+    add onClick to undo button 
+*/
+document.getElementById('undo').addEventListener("click", event => {
+    if (canvasObjects.length > 0) {
+        undoHistory.push(canvasObjects.pop());
+    } else if (canvasObjects.length == 0 && undoHistory.length > 0) {
+        canvasObjects = undoHistory;
+        undoHistory = [];
+    }
+})
+
+/*
+    add onClick to redo button
+*/
+document.getElementById('redo').addEventListener("click", event => {
+    if (undoHistory.length > 0) {
+        canvasObjects.push(undoHistory.pop());
+    }
+})
+
+/*
+    get all the stroke sliders and add an onInput function 
+*/
+document.querySelectorAll('.strokeSelector').forEach(slider => {
+    slider.addEventListener('input', updateStroke)
+})
+
+function updateStroke() {
+    document.body.style.setProperty('--strokeColor', rgba(strokeR.value, strokeG.value, strokeB.value, strokeA.value));
+}
+
+/*
+    get all the fill sliders and add an onInput function 
+*/
+document.querySelectorAll('.fillSelector').forEach(slider => {
+    slider.addEventListener('input', updateFill)
+})
+
+
+function updateFill() {
+    document.body.style.setProperty('--fillColor', rgba(fillR.value, fillG.value, fillB.value, fillA.value));
+}
 
 /*
     Window resize
@@ -122,18 +164,21 @@ window.addEventListener('resize', event => {
     Mouse down
 */
 canvas.addEventListener('mousedown', event => {
+    /*
+        as soon as the mouse is down create a new object
+    */
     switch (shape) {
         case "square":
-            currentObject = new square(event.offsetX, event.offsetY, event.offsetX, event.offsetY, strokeColor, fillColor, lineWidth.value);
+            currentObject = new square(event.offsetX, event.offsetY, event.offsetX, event.offsetY, document.body.style.getPropertyValue("--strokeColor"), document.body.style.getPropertyValue("--fillColor"), lineWidth.value);
             break;
         case "circle":
-            currentObject = new circle(event.offsetX, event.offsetY, event.offsetX, event.offsetY, strokeColor, fillColor, lineWidth.value);
+            currentObject = new circle(event.offsetX, event.offsetY, event.offsetX, event.offsetY, document.body.style.getPropertyValue("--strokeColor"), document.body.style.getPropertyValue("--strokeColor"), lineWidth.value);
             break;
         case "line":
-            currentObject = new line(event.offsetX, event.offsetY, event.offsetX, event.offsetY, strokeColor, fillColor, lineWidth.value);
+            currentObject = new line(event.offsetX, event.offsetY, event.offsetX, event.offsetY, document.body.style.getPropertyValue("--strokeColor"), document.body.style.getPropertyValue("--strokeColor"), lineWidth.value);
             break;
         case "pen":
-            currentObject = new pen(event.offsetX, event.offsetY, [], strokeColor, lineWidth.value);
+            currentObject = new pen(event.offsetX, event.offsetY, [], document.body.style.getPropertyValue("--strokeColor"), lineWidth.value);
             break;
     }
 
@@ -145,7 +190,9 @@ canvas.addEventListener('mousedown', event => {
     Mouse move
 */
 canvas.addEventListener('mousemove', event => {
-
+    /*
+        check that there is a current object, so that we can update it's size as the mouse moves
+    */
     if (currentObject) {
         currentObject.updateSize(event.offsetX, event.offsetY)
     }
@@ -156,29 +203,55 @@ canvas.addEventListener('mousemove', event => {
     Mouse up
 */
 canvas.addEventListener('mouseup', event => {
+    /*
+        If there is a current object when the mouse is released, and it has either a size or path
+    */
     if (currentObject && (currentObject.x2 != null || currentObject.path)) {
+        // add the current object to a list of objects to be drawn every frame
         canvasObjects.push(currentObject);
     }
-
+    /*
+        reset the current object
+    */
     currentObject = null;
 });
 
+/*
+    function called every 'frame' to draw all the shapes
+*/
 var renderObjects = function () {
+    /*
+        start by clearing the screen
+    */
     drawingContext.clearRect(0, 0, canvas.width, canvas.height)
+    
+    /*
+        then render all the objects registered in the canvasObjects array
+    */
     canvasObjects.forEach(obj => {
         obj.render();
     });
-    // If there is a object being drawn render it
+    // If the mouse is down and an currentObject exists, render it
     if (currentObject) {
         currentObject.render();
     }
+
+    /*
+        ask the browser to run this funcion again before the next frame
+    */
     window.requestAnimationFrame(renderObjects);
 }
 
+/*
+    pythagoras' theorem
+*/
 function getDistance(a, b) {
     return Math.sqrt(a * a + b * b);
 }
 
+/*
+    Shape object class definitions
+*/
 
 function square(x, y, x2, y2, stroke, fill, lineWidth) {
     this.x = x;
