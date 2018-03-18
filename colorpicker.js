@@ -1,4 +1,6 @@
 function ColorpickerCanvas(canvasElement, color) {
+    var _this = this;
+
     this.canvas = canvasElement;
     this.context2d = this.canvas.getContext('2d');
     this.color = color;
@@ -8,26 +10,42 @@ function ColorpickerCanvas(canvasElement, color) {
     this.canvas.height = 100;
     this.canvas.width = 255;
 
+    this.gradient = this.context2d.createLinearGradient(0,0,255,0);
+
+    this.gradient.addColorStop(0, "transparent");
+    this.gradient.addColorStop(1, "#f00");
+
+    this.context2d.fillStyle = this.gradient;
+    this.context2d.fillRect(0,0,255,100)
+
     this.crosshair = new Crosshair(this.context2d);
 
     this.updateselection = function(x,y) {
-        this.value = this.context2d.getImageData(x, y);
+        this.value = this.context2d.getImageData(x, y,1,1);
         this.crosshair.x = x;
         this.crosshair.y = y;
+        this.context2d.clearRect(0, 0, this.canvas.width, this.canvas.height)
+        this.context2d.fillStyle = this.gradient;
+        this.context2d.fillRect(0,0,255,100)
         this.crosshair.render();
-        dispatchEvent.target.dispatchEvent(this.selectionchanged)
+        this.canvas.dispatchEvent(this.selectionchanged)
     }
 
-    this.canvas.onmousemove = function(e) {
-        if (e.buttons == 1) {
-            console.log(this)
+    this.canvas.onmousemove =  event => {
+        if (event.buttons == 1) {
+            _this.updateselection(event.offsetX, event.offsetY)
+        }
+    }
+
+    this.canvas.onclick =  event => {
+        if (event.buttons == 1) {
+            _this.updateselection(event.offsetX, event.offsetY)
         }
     }
 
     this.selectionchanged = new CustomEvent("selectionchanged", {
-        detail: {
-            color : this.value
-        }
+        detail: this,
+        bubbles : true
     });
 
     this.selectionchanged.initEvent('selectionchanged', true, true);
@@ -40,15 +58,15 @@ function Crosshair(context2d, x, y) {
     this.y = y ? y : 0;
 
     this.render = function () {
-        context2d.beginPath();
-        context2d.lineWidth = 1;
-        context2d.strokeStyle = "#000";
-        context2d.moveTo(this.x + 5, this.y);
-        context2d.lineTo(this.x - 5, this.y);
-        context2d.moveTo(this.x, this.y + 5);
-        context2d.lineTo(this.x, this.y - 5);
-        context2d.stroke();
-        context2d.closePath();
+        this.context2d.beginPath();
+        this.context2d.lineWidth = 1;
+        this.context2d.strokeStyle = "#fff";
+        this.context2d.moveTo((this.x + 5), this.y);
+        this.context2d.lineTo((this.x - 5), this.y);
+        this.context2d.moveTo(this.x, (this.y + 5));
+        this.context2d.lineTo(this.x, (this.y - 5));
+        this.context2d.stroke();
+        this.context2d.closePath();
     }
 
 }
