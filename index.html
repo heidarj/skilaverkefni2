@@ -5,7 +5,6 @@
     <meta charset="utf-8" />
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="style.css">
-    <script src="colorpicker.js"></script>
 </head>
 
 <body>
@@ -17,9 +16,9 @@
             <button id="redo">Redo</button>
         </nav>
         <nav class="lineWidthNav">
-            <button class="lineWidthChange" id="minus">-</button>
+            <button  onclick="lineWidth.value--">-</button>
             <input id="lineWidth" type="text" value="1" autocomplete="none" disabled>
-            <button class="lineWidthChange" id="plus">+</button>
+            <button onclick="lineWidth.value++;">+</button>
         </nav>
         <nav>
             <button id="stroke" class="colorSelect">
@@ -44,7 +43,23 @@
     </div>
 </body>
 <div id="colorSelector">
-    <canvas id="colorPickerRed" ></canvas>
+    <h1>Stroke</h1>
+    <div class="colorSelector" id="strokeSelector">
+        Red<input class="strokeSelector" type="range" id="strokeSelectorRed" autocomplete="off" min="0" max="255" value="0">
+        Green<input class="strokeSelector" type="range" id="strokeSelectorGreen" autocomplete="off" min="0" max="255" value="0">
+        Blue<input class="strokeSelector" type="range" id="strokeSelectorBlue" autocomplete="off" min="0" max="255" value="0">
+        Alpha<input class="strokeSelector" type="range" id="strokeSelectorAlpha" autocomplete="off" min="0" max="1" value="1" step="0.1">
+    </div>
+    <span id="strokeSelectorPreview"></span>
+    <h1>Fill</h1>
+    <div class="colorSelector" id="fillSelector">
+        Red<input class="fillSelector" type="range" id="fillSelectorRed" autocomplete="off" min="0" max="255" value="0">
+        Green<input class="fillSelector" type="range" id="fillSelectorGreen" autocomplete="off" min="0" max="255" value="0">
+        Blue<input class="fillSelector" type="range" id="fillSelectorBlue" autocomplete="off" min="0" max="255" value="0">
+        Alpha<input class="fillSelector" type="range" id="fillSelectorAlpha" autocomplete="off" min="0" max="1" value="0" step="0.1">
+    </div>
+    <span id="fillSelectorPreview"></span>
+    <button id="colorSelectorDone">Done</button>
 </div>
 <script src="app.js"></script>
 
