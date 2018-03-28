@@ -172,10 +172,10 @@ canvas.addEventListener('mousedown', event => {
             currentObject = new square(event.offsetX, event.offsetY, event.offsetX, event.offsetY, document.body.style.getPropertyValue("--strokeColor"), document.body.style.getPropertyValue("--fillColor"), lineWidth.value);
             break;
         case "circle":
-            currentObject = new circle(event.offsetX, event.offsetY, event.offsetX, event.offsetY, document.body.style.getPropertyValue("--strokeColor"), document.body.style.getPropertyValue("--strokeColor"), lineWidth.value);
+            currentObject = new circle(event.offsetX, event.offsetY, event.offsetX, event.offsetY, document.body.style.getPropertyValue("--strokeColor"), document.body.style.getPropertyValue("--fillColor"), lineWidth.value);
             break;
         case "line":
-            currentObject = new line(event.offsetX, event.offsetY, event.offsetX, event.offsetY, document.body.style.getPropertyValue("--strokeColor"), document.body.style.getPropertyValue("--strokeColor"), lineWidth.value);
+            currentObject = new line(event.offsetX, event.offsetY, event.offsetX, event.offsetY, document.body.style.getPropertyValue("--strokeColor"), lineWidth.value);
             break;
         case "pen":
             currentObject = new pen(event.offsetX, event.offsetY, [], document.body.style.getPropertyValue("--strokeColor"), lineWidth.value);
